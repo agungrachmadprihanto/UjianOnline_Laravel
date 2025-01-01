@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\CourseQuestion;
+use DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 
 class CourseQuestionController extends Controller
@@ -31,9 +33,48 @@ class CourseQuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Course $course)
     {
-        //
+        // return 'hello world';
+
+        $validate = $request->validate([
+            'question' => 'required|string|max:255',
+            'answer' => 'required|array',
+            'answer.*' => 'required|string',
+            'correct_answer' => 'required|integer',
+        ]);
+
+        // dd($validate);      
+
+
+        DB::beginTransaction();
+
+        try{
+            $question = $course->questions()->create([
+                'question' => $request->question,
+            ]);
+
+            foreach($request->answer as $index => $answerText){
+                $isCorrect = ($request->correct_answer == $index);
+                $question->answers()->create([
+                    'answer' => $answerText,
+                    'is_correct' => $isCorrect
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('dashboardcourses.show', $course->id);
+        }
+        catch(\Exception $e){
+            DB::rollBack();
+            $error = ValidationException::withMessages([
+                'system_error' => ['System error', $e->getMessage()]
+            ]);
+
+            throw $error;
+        }
+
     }
 
     /**

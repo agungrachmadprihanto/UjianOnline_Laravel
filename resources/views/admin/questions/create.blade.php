@@ -174,8 +174,19 @@
                     </div>
                 </div>
             </div>
+
+            @if($errors->any())
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li class="py-5 px-5 bg-red-950 text-black">
+                            {{ $error }}
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
             <form method="POST" action="{{ route('dashboardcourse.store.question', $course) }}" id="add-question" class="mx-[70px] mt-[30px] flex flex-col gap-5">
-                @csrf
+               @csrf
                 <h2 class="font-bold text-2xl">Add New Question</h2>
                 <div class="flex flex-col gap-[10px]">
                     <p class="font-semibold">Question</p>
@@ -201,6 +212,7 @@
                         <label class="font-semibold flex items-center gap-[10px]"
                             ><input
                             type="radio"
+                            value={{ $i }}
                             name="correct_answer"
                             class="w-[24px] h-[24px] appearance-none checked:border-[3px] checked:border-solid checked:border-white rounded-full checked:bg-[#2B82FE] ring ring-[#EEEEEE]"
                             />
@@ -211,7 +223,7 @@
                     @endfor
               
                 </div>
-                <a href="course-details.html" class="w-[500px] h-[52px] p-[14px_20px] bg-[#6436F1] rounded-full font-bold text-white transition-all duration-300 hover:shadow-[0_4px_15px_0_#6436F14D] text-center">Save Question</a>
+                <button type="submit" class="w-[500px] h-[52px] p-[14px_20px] bg-[#6436F1] rounded-full font-bold text-white transition-all duration-300 hover:shadow-[0_4px_15px_0_#6436F14D] text-center">Save Question</button>
             </form>
         </div>
     </section>
